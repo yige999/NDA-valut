@@ -71,7 +71,12 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
 
     try {
       // Find the agreement in the state to get the file_url
-      const agreementToDelete = agreements.find(agreement => agreement.id === id)
+      const agreementToDelete = agreements.find((a) => a.id === id);
+
+      if (!agreementToDelete) {
+        console.error("Agreement not found");
+        return;
+      }
 
       // Delete from database
       const { error: dbError } = await supabase
@@ -82,10 +87,13 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
       if (dbError) throw dbError
 
       // Delete file from storage
-      if (agreementToDelete?.file_url) {
+      // Note: Check if database field is file_url or file_path, here we make it compatible
+      const filePath = agreementToDelete.file_url || agreementToDelete.file_path;
+
+      if (filePath) {
         const { error: storageError } = await supabase.storage
           .from('nda-files')
-          .remove([agreementToDelete.file_url])
+          .remove([filePath])
 
         if (storageError) {
           console.warn('Failed to delete file from storage:', storageError)
