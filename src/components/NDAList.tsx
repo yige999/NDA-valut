@@ -70,6 +70,9 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
     }
 
     try {
+      // Find the agreement in the state to get the file_url
+      const agreementToDelete = agreements.find(agreement => agreement.id === id)
+
       // Delete from database
       const { error: dbError } = await supabase
         .from('agreements')
@@ -79,14 +82,14 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
       if (dbError) throw dbError
 
       // Delete file from storage
-      // The file_url now stores the actual file path
-      const filePath = agreement.file_url
-      const { error: storageError } = await supabase.storage
-        .from('nda-files')
-        .remove([filePath])
+      if (agreementToDelete?.file_url) {
+        const { error: storageError } = await supabase.storage
+          .from('nda-files')
+          .remove([agreementToDelete.file_url])
 
-      if (storageError) {
-        console.warn('Failed to delete file from storage:', storageError)
+        if (storageError) {
+          console.warn('Failed to delete file from storage:', storageError)
+        }
       }
 
       // Refresh list
