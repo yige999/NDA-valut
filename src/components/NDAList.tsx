@@ -268,13 +268,20 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
+                    onClick={() => {
+                      // Toggle Alert (Paywall Trigger)
+                      if (!agreement.alert_enabled) {
+                        // Open Creem payment link in new tab
+                        window.open('https://pay.creem.io/payment/03a39489-f194-4ca6-a569-9463606e5195', '_blank');
+                      }
+                    }}
                     className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
                       agreement.alert_enabled
                         ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-500'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                     }`}
                   >
-                    {agreement.alert_enabled ? 'Enabled' : 'Disabled'}
+                    {agreement.alert_enabled ? 'Enabled' : 'Enable'}
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
