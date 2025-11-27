@@ -152,7 +152,7 @@ function DashboardContent() {
               </SubscriptionGuard>
 
               {/* List Section */}
-              <NDAList refreshTrigger={refreshTrigger} />
+              <NDAList user={user} refreshTrigger={refreshTrigger} />
             </div>
 
             {/* Sidebar */}
