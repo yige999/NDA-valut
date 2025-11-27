@@ -3,6 +3,7 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { checkFeatureAccess, canUploadMoreNDAs } from '@/lib/subscription';
+import { getUserSubscriptionSafe } from '@/lib/subscription-fallback';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import {
@@ -99,13 +100,29 @@ export default function SubscriptionGuard({
         setLoading(true);
 
         if (feature) {
-          // Check specific feature access
-          const access = await checkFeatureAccess(user.id, feature);
-          setHasAccess(access);
+          // Check specific feature access with fallback
+          try {
+            const access = await checkFeatureAccess(user.id, feature);
+            setHasAccess(access);
+          } catch (error) {
+            console.error('Error checking feature access:', error);
+            // Fallback to checking subscription type directly
+            const subscription = await getUserSubscriptionSafe(user.id);
+            const hasProAccess = subscription?.plan_type === 'pro' && subscription.status === 'active';
+            setHasAccess(hasProAccess);
+          }
         } else {
-          // Default to checking NDA upload limit
-          const canUpload = await canUploadMoreNDAs(user.id);
-          setHasAccess(canUpload);
+          // Default to checking NDA upload limit with fallback
+          try {
+            const canUpload = await canUploadMoreNDAs(user.id);
+            setHasAccess(canUpload);
+          } catch (error) {
+            console.error('Error checking upload limit:', error);
+            // Fallback to checking subscription and current NDA count
+            const subscription = await getUserSubscriptionSafe(user.id);
+            const hasProAccess = subscription?.plan_type === 'pro' && subscription.status === 'active';
+            setHasAccess(hasProAccess);
+          }
         }
       } catch (error) {
         console.error('Error checking subscription access:', error);

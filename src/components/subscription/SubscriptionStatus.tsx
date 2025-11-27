@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserSubscription, getSyncedUserSubscription, cancelSubscription } from '@/lib/subscription';
+import { getUserSubscriptionSafe } from '@/lib/subscription-fallback';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import {
@@ -31,11 +32,32 @@ export default function SubscriptionStatus({ showActions = true, compact = false
       try {
         setLoading(true);
         setError(null);
+
+        // First try synced subscription (with Creem)
         const sub = await getSyncedUserSubscription(user.id);
         setSubscription(sub);
       } catch (err) {
-        console.error('Failed to load subscription:', err);
-        setError('Failed to load subscription information');
+        console.error('Failed to load synced subscription:', err);
+
+        // Fallback to safe subscription (without Creem)
+        try {
+          const fallbackSub = await getUserSubscriptionSafe(user.id);
+          setSubscription(fallbackSub);
+        } catch (fallbackErr) {
+          console.error('Failed to load fallback subscription:', fallbackErr);
+          // Default to free plan to prevent complete failure
+          setSubscription({
+            id: 'default',
+            user_id: user.id,
+            creem_subscription_id: null,
+            plan_type: 'free',
+            status: 'active',
+            current_period_start: new Date().toISOString(),
+            current_period_end: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
       } finally {
         setLoading(false);
       }
