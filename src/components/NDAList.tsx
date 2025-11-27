@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import NDAEditModal from './NDAEditModal'
@@ -31,16 +31,13 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
   const [error, setError] = useState('')
   const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [fileUrls, setFileUrls] = useState<{[key: string]: string}>({})
   const [loadingUrls, setLoadingUrls] = useState<{[key: string]: boolean}>({})
 
-  useEffect(() => {
-    if (!user) return
-
-    fetchAgreements()
-  }, [user, refreshTrigger])
-
-  const fetchAgreements = async () => {
+  // 修复1: 使用 useCallback 包裹 fetchAgreements，或者将其移入 useEffect
+  // 这里我们选择使用 useCallback，这样可以在 useEffect 外部也能调用它（比如 handleUpdateSuccess）
+  const fetchAgreements = useCallback(async () => {
     if (!user) return
 
     setLoading(true)
@@ -62,24 +59,26 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user]) // 依赖 user
+
+  // useEffect 现在依赖 fetchAgreements，这是安全的，因为上面用了 useCallback
+  useEffect(() => {
+    fetchAgreements()
+  }, [fetchAgreements, refreshTrigger])
 
   const handleDelete = async (id: string) => {
+    // eslint-disable-next-line no-restricted-globals
     if (!confirm('Are you sure you want to delete this NDA?')) return
 
-    // 1. 先通过 ID 找到对应的 Agreement 对象
     const agreementToDelete = agreements.find((a) => a.id === id)
 
-    // 2. 安全检查：如果找不到对象，直接返回
     if (!agreementToDelete) {
       console.error('Agreement not found')
       return
     }
 
-    // 3. 获取文件路径 (兼容 file_url 或 file_path 字段)
     const filePath = agreementToDelete.file_url || agreementToDelete.file_path
 
-    // 4. 执行删除操作
     const { error: storageError } = await supabase.storage
       .from('nda-files')
       .remove([filePath])
@@ -97,8 +96,7 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
     if (dbError) {
       alert('Error deleting record: ' + dbError.message)
     } else {
-      // 成功后更新本地列表
-      setAgreements(agreements.filter((a) => a.id !== id))
+      setAgreements(prev => prev.filter((a) => a.id !== id))
     }
   }
 
@@ -166,18 +164,17 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
     setLoadingUrls(prev => ({ ...prev, [agreementId]: true }))
 
     try {
-      // The file_url now stores the actual file path (e.g., "user_id/filename.pdf")
       const actualFilePath = filePath
 
       const { data, error } = await supabase.storage
         .from('nda-files')
-        .createSignedUrl(actualFilePath, 60) // 60 seconds expiry
+        .createSignedUrl(actualFilePath, 60)
 
       if (error) throw error
 
       setFileUrls(prev => ({ ...prev, [agreementId]: data.signedUrl }))
 
-      // Open the signed URL in a new tab
+      // 修复2: 增加 'noopener,noreferrer' 以消除安全警告
       window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
     } catch (error: any) {
       console.error('Error getting signed URL:', error)
@@ -304,10 +301,9 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
                     onClick={() => {
-                      // Toggle Alert (Paywall Trigger)
                       if (!agreement.alert_enabled) {
-                        // Open Creem payment link in new tab
-                        window.open('https://pay.creem.io/payment/03a39489-f194-4ca6-a569-9463606e5195', '_blank');
+                        // 修复3: 支付链接也增加安全参数
+                        window.open('https://pay.creem.io/payment/03a39489-f194-4ca6-a569-9463606e5195', '_blank', 'noopener,noreferrer');
                       }
                     }}
                     className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
@@ -346,7 +342,6 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
         </table>
       </div>
 
-      {/* Edit Modal */}
       {editingAgreement && (
         <NDAEditModal
           agreement={editingAgreement}
