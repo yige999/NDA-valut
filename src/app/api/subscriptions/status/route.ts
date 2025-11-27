@@ -1,29 +1,18 @@
+// 临时禁用Creem的订阅状态API
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getSyncedUserSubscription } from '@/lib/subscription';
+import { getUserSubscription } from '@/lib/subscription';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
-
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Get user's subscription status (synced with Creem)
-    const subscription = await getSyncedUserSubscription(user.id);
+    // 使用临时版本的getUserSubscription
+    const subscription = await getUserSubscription('temp_user_id');
 
     return NextResponse.json({
       subscription,
       user: {
-        id: user.id,
-        email: user.email,
+        id: 'temp_user_id',
+        email: 'user@example.com',
       }
     });
 
