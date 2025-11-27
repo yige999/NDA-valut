@@ -31,6 +31,8 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
   const [error, setError] = useState('')
   const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [fileUrls, setFileUrls] = useState<{[key: string]: string}>({})
+  const [loadingUrls, setLoadingUrls] = useState<{[key: string]: boolean}>({})
 
   useEffect(() => {
     if (!user) return
@@ -77,7 +79,8 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
       if (dbError) throw dbError
 
       // Delete file from storage
-      const filePath = `${user!.id}/${fileName.split('/').pop()}`
+      // The file_url now stores the actual file path
+      const filePath = agreement.file_url
       const { error: storageError } = await supabase.storage
         .from('nda-files')
         .remove([filePath])
@@ -150,6 +153,33 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
   const handleUpdateSuccess = () => {
     fetchAgreements()
     handleCloseEditModal()
+  }
+
+  const getSignedUrl = async (agreementId: string, filePath: string) => {
+    if (!user) return
+
+    setLoadingUrls(prev => ({ ...prev, [agreementId]: true }))
+
+    try {
+      // The file_url now stores the actual file path (e.g., "user_id/filename.pdf")
+      const actualFilePath = filePath
+
+      const { data, error } = await supabase.storage
+        .from('nda-files')
+        .createSignedUrl(actualFilePath, 60) // 60 seconds expiry
+
+      if (error) throw error
+
+      setFileUrls(prev => ({ ...prev, [agreementId]: data.signedUrl }))
+
+      // Open the signed URL in a new tab
+      window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
+    } catch (error: any) {
+      console.error('Error getting signed URL:', error)
+      setError(error.message || 'Failed to generate download link')
+    } finally {
+      setLoadingUrls(prev => ({ ...prev, [agreementId]: false }))
+    }
   }
 
   if (loading) {
@@ -285,14 +315,13 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <a
-                    href={agreement.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-500 mr-4"
+                  <button
+                    onClick={() => getSignedUrl(agreement.id, agreement.file_url)}
+                    disabled={loadingUrls[agreement.id]}
+                    className="text-blue-600 hover:text-blue-500 mr-4 disabled:text-blue-300 disabled:cursor-not-allowed"
                   >
-                    View
-                  </a>
+                    {loadingUrls[agreement.id] ? 'Loading...' : 'View'}
+                  </button>
                   <button
                     onClick={() => handleEdit(agreement)}
                     className="text-gray-600 hover:text-gray-500 mr-4"

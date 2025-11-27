@@ -109,10 +109,8 @@ export default function NDAUpload({ onUploadSuccess }: NDAUploadProps) {
 
       if (uploadError) throw uploadError
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('nda-files')
-        .getPublicUrl(fileName)
+      // Store the file path instead of public URL (since bucket is private)
+      const filePath = fileName
 
       // Calculate agreement status
       const expirationDate = new Date(formData.expiration_date)
@@ -135,7 +133,7 @@ export default function NDAUpload({ onUploadSuccess }: NDAUploadProps) {
         .insert({
           user_id: user.id,
           file_name: file.name,
-          file_url: publicUrl,
+          file_url: filePath, // Store file path, not public URL
           file_size: file.size,
           counterparty_name: formData.counterparty_name,
           effective_date: formData.effective_date || null,
