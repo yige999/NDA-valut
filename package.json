@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "node scripts/setup-local.js",
+    "setup:win": "scripts\\setup-local.bat",
+    "setup:mac": "chmod +x scripts/setup-local.sh && ./scripts/setup-local.sh"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

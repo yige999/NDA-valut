@@ -1,36 +1,166 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 NDAVault
 
-## Getting Started
+**Simple NDA Management Software for Agencies**
 
-First, run the development server:
+Stop managing NDAs in Excel. Upload, track, and never miss an expiration date.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Features
+
+- 🔐 **Secure Authentication** - Email/Password + Google OAuth
+- 📄 **PDF Management** - Upload, edit, delete NDA files (10MB limit)
+- 📊 **Smart Tracking** - Automatic status: Active/Expiring Soon/Expired
+- 📧 **Email Alerts** - 30-day expiration warnings (Pro feature)
+- 💳 **Payment System** - Creem integration for subscription management
+- 📱 **Responsive Design** - Works perfectly on desktop and mobile
+- 🎯 **SEO Optimized** - Built to rank for "NDA Management Software"
+
+## 💰 Pricing
+
+- **Free Plan** - Up to 10 NDAs, manual deadline tracking
+- **Pro Plan** - $49/month, unlimited NDAs + automatic email alerts
+
+## 🚀 Quick Start
+
+### Local Development
+
+1. **Clone and setup:**
+   ```bash
+   git clone https://github.com/yige999/NDA-valut.git
+   cd NDA-valut
+
+   # Windows users:
+   npm run setup:win
+
+   # Mac/Linux users:
+   npm run setup:mac
+   ```
+
+2. **Configure environment:**
+   ```bash
+   # Edit .env.local with your actual values
+   cp .env.example .env.local
+   ```
+
+3. **Start development:**
+   ```bash
+   npm run dev
+   ```
+   Visit http://localhost:3000
+
+### Production Deployment
+
+1. **Deploy to Vercel:**
+   - Visit https://vercel.com/new
+   - Import repository: `yige999/NDA-valut`
+   - Configure environment variables (see `VERCEL_ENV_SETUP.md`)
+
+2. **Set up Supabase:**
+   - Run `supabase/schema.sql` in your Supabase SQL editor
+   - Enable Google OAuth in Authentication settings
+   - Create Storage bucket named `nda-files`
+
+## 🏗️ Tech Stack
+
+- **Frontend:** Next.js 16 + TypeScript + Tailwind CSS
+- **Backend:** Supabase (PostgreSQL + Auth + Storage)
+- **Payments:** Creem API
+- **Email:** Resend
+- **Deployment:** Vercel
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                    # Next.js 13+ App Router
+│   ├── api/               # API routes
+│   ├── admin/             # Admin dashboard
+│   ├── billing/           # Subscription management
+│   ├── dashboard/         # Main app interface
+│   ├── login/             # Authentication pages
+│   ├── pricing/           # Pricing page
+│   └── signup/
+├── components/            # Reusable React components
+│   ├── guards/           # Route protection
+│   ├── payment/          # Payment forms
+│   ├── subscription/     # Subscription components
+│   └── ui/              # UI components
+├── contexts/            # React contexts
+├── lib/                 # Utility functions
+└── scripts/             # Setup scripts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔧 Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env.local` and configure:
 
-## Learn More
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-To learn more about Next.js, take a look at the following resources:
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Creem Payments
+CREEM_API_KEY=your_creem_api_key
+CREEM_SECRET_KEY=your_creem_secret_key
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Email (Resend)
+RESEND_API_KEY=your_resend_api_key
+```
 
-## Deploy on Vercel
+## 📚 Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [`SUPABASE_SETUP.md`](./SUPABASE_SETUP.md) - Database setup
+- [`VERCEL_ENV_SETUP.md`](./VERCEL_ENV_SETUP.md) - Deployment configuration
+- [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) - Production deployment
+- [`CREEM_SETUP.md`](./CREEM_SETUP.md) - Payment system setup
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🧪 Testing
+
+- **Manual Testing:** Visit `/admin/alerts` to test email alerts
+- **API Testing:** Check `/api/send-alerts` endpoint
+- **Payment Testing:** Use Creem test mode for payment flows
+
+## 🎯 Business Model
+
+This MVP is designed for rapid revenue generation:
+
+1. **Free Tier** - Hook users with core functionality
+2. **Pro Conversion** - Drive upgrades with automatic email alerts
+3. **Low Churn** - Sticky business with recurring NDA management needs
+4. **SEO Growth** - Target "NDA Management Software" (KD 6%)
+
+## 🚀 Launch Strategy
+
+1. **Reddit Launch** - r/agency, r/smallbusiness with authentic story
+2. **Product Hunt** - Technical community launch
+3. **SEO Optimization** - Content marketing for long-term growth
+4. **Twitter/X** - Founder-led marketing
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+## 🆘 Support
+
+- 📧 Email: support@ndavault.app
+- 🐛 Issues: [GitHub Issues](https://github.com/yige999/NDA-valut/issues)
+- 💬 Discord: [Coming soon]
+
+---
+
+**Built with ❤️ for agencies tired of Excel-based NDA management**
+
+🎯 *Your NDAs deserve better than spreadsheets.*
