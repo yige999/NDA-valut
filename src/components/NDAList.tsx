@@ -20,13 +20,18 @@ interface Agreement {
   created_at: string
 }
 
-export default function NDAList({ user }: { user: any }) {
+interface NDAListProps {
+  user: any;
+  refreshTrigger?: number; // 添加这个属性
+}
+
+export default function NDAList({ user, refreshTrigger }: NDAListProps) {
   const [agreements, setAgreements] = useState<Agreement[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchAgreements()
-  }, [])
+  }, [refreshTrigger])
 
   const fetchAgreements = async () => {
     const { data, error } = await supabase
