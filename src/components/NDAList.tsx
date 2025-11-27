@@ -64,47 +64,41 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
     }
   }
 
-  const handleDelete = async (id: string, fileName: string) => {
-    if (!confirm('Are you sure you want to delete this NDA? This action cannot be undone.')) {
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this NDA?')) return
+
+    // 1. 先通过 ID 找到对应的 Agreement 对象
+    const agreementToDelete = agreements.find((a) => a.id === id)
+
+    // 2. 安全检查：如果找不到对象，直接返回
+    if (!agreementToDelete) {
+      console.error('Agreement not found')
       return
     }
 
-    try {
-      // Find the agreement in the state to get the file_url
-      const agreementToDelete = agreements.find((a) => a.id === id);
+    // 3. 获取文件路径 (兼容 file_url 或 file_path 字段)
+    const filePath = agreementToDelete.file_url || agreementToDelete.file_path
 
-      if (!agreementToDelete) {
-        console.error("Agreement not found");
-        return;
-      }
+    // 4. 执行删除操作
+    const { error: storageError } = await supabase.storage
+      .from('nda-files')
+      .remove([filePath])
 
-      // Delete from database
-      const { error: dbError } = await supabase
-        .from('agreements')
-        .delete()
-        .eq('id', id)
+    if (storageError) {
+      alert('Error deleting file: ' + storageError.message)
+      return
+    }
 
-      if (dbError) throw dbError
+    const { error: dbError } = await supabase
+      .from('agreements')
+      .delete()
+      .eq('id', id)
 
-      // Delete file from storage
-      // Note: Check if database field is file_url or file_path, here we make it compatible
-      const filePath = agreementToDelete.file_url || agreementToDelete.file_path;
-
-      if (filePath) {
-        const { error: storageError } = await supabase.storage
-          .from('nda-files')
-          .remove([filePath])
-
-        if (storageError) {
-          console.warn('Failed to delete file from storage:', storageError)
-        }
-      }
-
-      // Refresh list
-      fetchAgreements()
-    } catch (error: any) {
-      console.error('Delete error:', error)
-      setError(error.message || 'Failed to delete NDA')
+    if (dbError) {
+      alert('Error deleting record: ' + dbError.message)
+    } else {
+      // 成功后更新本地列表
+      setAgreements(agreements.filter((a) => a.id !== id))
     }
   }
 
@@ -340,7 +334,7 @@ export default function NDAList({ refreshTrigger }: NDAListProps) {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(agreement.id, agreement.file_url)}
+                    onClick={() => handleDelete(agreement.id)}
                     className="text-red-600 hover:text-red-500"
                   >
                     Delete
