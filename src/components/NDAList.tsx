@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { supabase } from '@/lib/supabase'
 import { format, differenceInDays, parseISO } from 'date-fns'
 import { Trash2, FileText, Bell, BellOff, Loader2, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 
@@ -21,7 +21,6 @@ interface Agreement {
 }
 
 export default function NDAList({ user }: { user: any }) {
-  const supabase = createClient()
   const [agreements, setAgreements] = useState<Agreement[]>([])
   const [loading, setLoading] = useState(true)
 
