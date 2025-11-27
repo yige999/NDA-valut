@@ -30,6 +30,58 @@ export default function Home() {
             Start Tracking for Free
           </Link>
 
+          {/* --- Dashboard Preview --- */}
+          <div className="mt-16 relative mx-auto w-full max-w-4xl rounded-xl bg-slate-900/5 p-2 ring-1 ring-inset ring-slate-900/10 lg:rounded-2xl lg:p-4 shadow-xl">
+            <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-slate-900/5">
+              <div className="mb-6 flex items-center justify-between border-b pb-4">
+                <div className="flex gap-2 items-center">
+                   <div className="text-blue-600 font-bold">NDAVault</div>
+                   <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Dashboard</span>
+                </div>
+                <div className="flex gap-4">
+                  <div className="h-8 w-24 rounded bg-blue-600 animate-pulse opacity-50"></div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between rounded-lg border border-red-100 bg-red-50/50 p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-xl shadow-sm">📄</div>
+                    <div>
+                      <div className="font-semibold text-slate-900">OpenAI, Inc.</div>
+                      <div className="text-xs text-slate-500">Uploaded Oct 2023</div>
+                    </div>
+                  </div>
+                  <div className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 flex items-center gap-1">
+                    ⚠️ Expired
+                  </div>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-xl">📄</div>
+                    <div>
+                      <div className="font-medium text-slate-900">Vercel Inc.</div>
+                      <div className="text-xs text-slate-500">Uploaded Jan 2024</div>
+                    </div>
+                  </div>
+                  <div className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700 flex items-center gap-1">
+                    ⏳ Expiring in 15d
+                  </div>
+                </div>
+                 <div className="flex items-center justify-between rounded-lg border p-4 opacity-60">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-xl">📄</div>
+                    <div>
+                      <div className="font-medium text-slate-900">Supabase Corp.</div>
+                    </div>
+                  </div>
+                  <div className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                    Active
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <p className="text-sm text-gray-500 mt-4">
             No credit card required • Free forever for up to 10 NDAs
           </p>
@@ -141,9 +193,29 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="mt-32 border-t border-gray-200 py-12">
-        <div className="max-w-7xl mx-auto px-8 text-center text-gray-500">
-          <p>&copy; 2024 NDAVault. All rights reserved.</p>
+      <footer className="bg-slate-50 py-12 border-t mt-20">
+        <div className="mx-auto max-w-6xl px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="text-center md:text-left">
+            <div className="text-xl font-bold text-blue-600">NDAVault</div>
+            <p className="mt-2 text-sm text-slate-500">
+              Securely managing your agreements, so you can focus on closing deals.
+            </p>
+            <p className="mt-4 text-sm text-slate-400">
+              © {new Date().getFullYear()} NDAVault. All rights reserved.
+            </p>
+          </div>
+
+          <div className="flex gap-8 text-sm">
+            <div className="flex flex-col gap-4">
+              <span className="font-semibold text-slate-900">Legal</span>
+              <Link href="#" className="text-slate-600 hover:text-blue-600">Privacy Policy</Link>
+              <Link href="#" className="text-slate-600 hover:text-blue-600">Terms of Service</Link>
+            </div>
+             <div className="flex flex-col gap-4">
+              <span className="font-semibold text-slate-900">Support</span>
+              <a href="mailto:support@ndavault.com" className="text-slate-600 hover:text-blue-600">Contact Us</a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
